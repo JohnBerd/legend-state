@@ -106,30 +106,30 @@ type NonPrimitiveKeys<T> = Pick<T, { [K in keyof T]-?: T[K] extends Primitive ? 
 type Recurse<T, K extends keyof T, TRecurse> = T[K] extends ObservableReadable
     ? T[K]
     : T[K] extends Promise<infer t>
-    ? Observable<t & WithState>
-    : T[K] extends Function
-    ? T[K]
-    : T[K] extends ObservableProxyTwoWay<infer t, infer t2>
-    ? ObservableProxyTwoWay<t, t2>
-    : T[K] extends ObservableProxy<infer t>
-    ? ObservableProxy<t>
-    : T[K] extends ObservableProxyLink<infer t>
-    ? ObservableProxyLink<t>
-    : T[K] extends Map<any, any> | WeakMap<any, any>
-    ? ObservableMap<T[K]>
-    : T[K] extends Set<any> | WeakSet<any>
-    ? ObservableSet<T[K]>
-    : T[K] extends Set<any> | WeakSet<any>
-    ? T[K] & ObservablePrimitiveBaseFns<T[K]>
-    : T[K] extends OpaqueObject<T[K]>
-    ? T[K] & ObservablePrimitiveChildFns<T[K]>
-    : T[K] extends Primitive
-    ? ObservablePrimitiveChild<T[K]>
-    : T[K] extends Array<any>
-    ? ObservableObjectFns<T[K]> & ObservableArrayOverride<T[K][number]>
-    : T extends object
-    ? TRecurse
-    : T[K];
+      ? Observable<t & WithState>
+      : T[K] extends Function
+        ? T[K]
+        : T[K] extends ObservableProxyTwoWay<infer t, infer t2>
+          ? ObservableProxyTwoWay<t, t2>
+          : T[K] extends ObservableProxy<infer t>
+            ? ObservableProxy<t>
+            : T[K] extends ObservableProxyLink<infer t>
+              ? ObservableProxyLink<t>
+              : T[K] extends Map<any, any> | WeakMap<any, any>
+                ? ObservableMap<T[K]>
+                : T[K] extends Set<any> | WeakSet<any>
+                  ? ObservableSet<T[K]>
+                  : T[K] extends Set<any> | WeakSet<any>
+                    ? T[K] & ObservablePrimitiveBaseFns<T[K]>
+                    : T[K] extends OpaqueObject<T[K]>
+                      ? T[K] & ObservablePrimitiveChildFns<T[K]>
+                      : T[K] extends Primitive
+                        ? ObservablePrimitiveChild<T[K]>
+                        : T[K] extends Array<any>
+                          ? ObservableObjectFns<T[K]> & ObservableArrayOverride<T[K][number]>
+                          : T extends object
+                            ? TRecurse
+                            : T[K];
 
 type ObservableFnsRecursiveUnsafe<T> = {
     [K in keyof T]-?: Recurse<T, K, ObservableObject<NonNullable<T[K]>>>;
@@ -144,10 +144,10 @@ type ObservableComputedFnsRecursive<T> = {
     readonly [K in keyof T]-?: Recurse<T, K, ObservableBaseFns<NonNullable<T[K]>>>;
 };
 
-export interface ObservableEvent {
-    fire(): void;
-    on(cb?: () => void): ObservableListenerDispose;
-    get(): void;
+export interface ObservableEvent<T> {
+    fire(data?: T): void;
+    on(cb: (data?: T) => void): ObservableListenerDispose;
+    get(): T | undefined;
 }
 
 export type QueryByModified<T> =
@@ -406,10 +406,10 @@ export type ObservablePrimitiveChild<T = any> = [T] extends [boolean]
 export type ObservableObjectOrArray<T> = T extends Map<any, any> | WeakMap<any, any>
     ? ObservableMap<T>
     : T extends Set<any> | WeakSet<any>
-    ? ObservableSet<T>
-    : T extends any[]
-    ? ObservableArray<T>
-    : ObservableObject<T>;
+      ? ObservableSet<T>
+      : T extends any[]
+        ? ObservableArray<T>
+        : ObservableObject<T>;
 
 export type ObservableComputed<T = any> = ObservableBaseFns<T> & ObservableComputedFnsRecursive<T>;
 export type ObservableComputedTwoWay<T = any, T2 = T> = ObservableComputed<T> & ObservablePrimitiveBaseFns<T2>;
@@ -417,8 +417,8 @@ type Equals<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y 
 export type Observable<T = any> = Equals<T, any> extends true
     ? ObservableObject<any>
     : [T] extends [object]
-    ? ObservableObjectOrArray<T>
-    : ObservablePrimitive<T>;
+      ? ObservableObjectOrArray<T>
+      : ObservablePrimitive<T>;
 
 export type ObservableReadable<T = any> =
     | ObservableBaseFns<T>
